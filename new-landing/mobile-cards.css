@@ -1,0 +1,29 @@
+/* Phone product cards, refined. Loaded after mobile.css; phone only. */
+@media (width <= 820px) {
+  /* one system for all three cards */
+  body .products .product-row { gap: 16px; margin-top: 16px; }
+  body .products .card { display: flex; flex-direction: column; align-items: flex-start; min-height: 0; padding: 24px; overflow: hidden; }
+  body .products .card .card-content { display: contents; }
+  body .products .card .product-card-logo { order: 1; position: relative; inset: auto; width: 96px; height: auto; margin: 0; translate: none; z-index: 3; }
+  body .products .card h2,
+  body .products .card h3 { order: 2; position: relative; z-index: 3; width: auto; max-width: none; margin: 16px 0 0; font-size: 32px; line-height: 1; letter-spacing: -.05em; }
+  body .products .card .card-actions { order: 4; position: relative; z-index: 3; display: flex; flex-direction: row; flex-wrap: nowrap; align-items: stretch; gap: 12px; width: 100%; margin-top: auto; padding: 24px 0 0; }
+  body .products .card .card-actions .button { flex: 1 1 0; min-width: 0; min-height: 48px; padding: 0 16px; font-size: 16px; white-space: nowrap; }
+
+  /* Photos: headline left, the hand and phone on the right, fading out above the buttons */
+  body .products .card-photos { min-height: min(calc(137.4vw - 88px), 520px); }   /* 326 x 448 at 390 */
+  body .products .card-photos h2 { max-width: 148px; }
+  body .products .card-photos .plan-pill { position: relative; inset: auto; display: table; margin-top: 16px; padding: 8px 12px; font-size: 16px; }
+  body .products .card-photos .photo-clip { clip-path: none; }
+  body .products .card-photos .photo-device { position: absolute; inset: auto -48px calc(24px + 48px + 24px) auto; z-index: 1; width: min(72%, 300px); height: auto; margin: 0;
+    -webkit-mask-image: linear-gradient(to bottom, #000 86%, transparent 100%); mask-image: linear-gradient(to bottom, #000 86%, transparent 100%); }
+  body .products .card-photos .photo-device img { width: 100%; height: auto; display: block; }
+
+  /* Locker: headline across, the whole phone and its e block centred below (its own floor shadow ends it, so no bleed) */
+  body .products .card-locker h3,
+  body .products .card-auth h3 { max-width: 240px; }
+  body .products .card-locker .locker-device { order: 3; position: relative; inset: auto; width: min(88%, 320px); margin: 16px auto 0; align-self: center; z-index: 1; }
+
+  /* Auth: headline across, the tilted phone runs off the right edge */
+  body .products .card-auth .auth-device { order: 3; position: relative; inset: auto; width: min(calc(100% + 64px), 480px); margin: 16px -48px 0 -16px; align-self: flex-start; z-index: 1; }
+}

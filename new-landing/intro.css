@@ -1,0 +1,280 @@
+/* Hero intro: words rise, "nonsense" gets struck, then the full stop
+   bounces across "All the good stuff" and each word it lands on fills Ente green. */
+:root { --ente-green: #1cc22c; }
+
+/* word timing (overrides the build's nth-child delays) */
+html .hero-title .hero-line .hw-1 { animation-delay: .10s; }
+html .hero-title .hero-line .hw-2 { animation-delay: .17s; }
+html .hero-title .hero-line .hw-3 { animation-delay: .24s; }
+html .hero-title .hero-line .hw-4 { animation-delay: .31s; }
+html .hero-title .hero-line .hw-5 { animation-delay: .46s; }
+html .hero-title .hero-line .hw-6 { animation-delay: .53s; }
+html .hero-title .hero-line .hw-7 { animation-delay: .60s; }
+html .hero-title .hero-line .hw-8 { animation-delay: .67s; }
+
+.hero-nowrap { white-space: nowrap; }
+
+/* the full stop is its own glyph so it can fly */
+.hero-dot {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(.52em) rotate(1.8deg);
+  animation: .82s cubic-bezier(.16,1,.3,1) forwards hero-word-rise;
+  color: var(--text);
+  will-change: transform;
+  position: relative;
+  z-index: 2;
+}
+
+/* strike: a quicker, marker-like draw; the struck word then goes dead grey */
+html .hero-title .hero-strike {
+  animation: .3s cubic-bezier(.7,0,.3,1) 1.15s forwards hero-strike-on;
+}
+/* the strike lands: "nonsense" gets knocked crooked, hard, and stays that way */
+html[data-intro] .hero-title .hero-word-struck.is-knocked {
+  transform-origin: 8% 90%;
+  animation: .62s linear forwards hero-knock;
+}
+@keyframes hero-knock {
+  0%   { opacity: 1; transform: translateY(0) rotate(0deg); }
+  12%  { opacity: 1; transform: translateY(.03em) rotate(2.6deg); }
+  30%  { opacity: 1; transform: translateY(.008em) rotate(.5deg); }
+  48%  { opacity: 1; transform: translateY(.018em) rotate(1.6deg); }
+  66%  { opacity: 1; transform: translateY(.012em) rotate(1.05deg); }
+  82%  { opacity: 1; transform: translateY(.015em) rotate(1.3deg); }
+  100% { opacity: 1; transform: translateY(.014em) rotate(1.2deg); }
+}
+
+.hero-word-struck { transition: color .18s ease-out; }
+
+/* letters of line one, moved by the collision */
+.hero-line-good .hl { display: inline-block; transform-origin: 50% 100%; will-change: transform; }
+.hero-line-good .hl.is-green,
+.hero-dot.is-green { color: var(--line-c, var(--ente-green)); }
+/* hover a product card: the line takes that product's colour, letter by letter from the left (hitshine.js) */
+html.tint-ready .hero-line-good .hl,
+html.tint-ready .hero-line-good .hero-dot,
+html.tint-ready .hero-dot { transition: color .3s cubic-bezier(.23,1,.32,1) calc(var(--i, 0) * 14ms); }
+/* on impact the good stuff turns rounded: Nunito Heavy, hosted here (the page's security policy blocks Google Fonts) */
+@font-face { font-family: Nunito; font-weight: 900; font-style: normal; font-display: swap; src: url(/assets/fonts/nunito-latin-900.woff2) format('woff2'); }
+.hero-line-good .hl.is-green,
+.hero-dot.is-green { font-family: Nunito, Outfit, sans-serif; font-weight: 900; letter-spacing: -.055em; }
+
+/* cards come in one by one while the headline is still rising */
+html[data-intro] .hero-card-slot:first-child { animation-delay: .5s; }
+html[data-intro] .hero-card-slot:nth-child(2) { animation-delay: .62s; }
+html[data-intro] .hero-card-slot:nth-child(3) { animation-delay: .74s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-dot { animation: none; opacity: 1; transform: none; }
+  .hero-word-struck { transition: none; }
+  .hero-line-good .hl, .hero-dot { transition: none; }
+}
+
+/* live Rive duckies over the static picture */
+.hero-duckies { position: absolute; }
+.hero-duckies .hero-duckies-rive {
+  position: absolute; left: 0; bottom: 0;
+  width: 100%; aspect-ratio: 4097 / 1487; display: block;
+  opacity: 0; transition: opacity .2s linear;
+}
+.hero-duckies.is-live .hero-duckies-rive { opacity: 1; }
+.hero-duckies.is-live img { visibility: hidden; }
+
+/* duckies: always on the first screen, a simple loop. Roll in, stay a while, roll out, gone a beat, again.
+   Replaces the scroll-triggered roll (is-duckies-in / is-duckies-out are ignored). */
+html[data-intro] .hero-fold .hero-duckies,
+html[data-intro] .hero-fold.is-duckies-in .hero-duckies,
+html[data-intro] .hero-fold.is-duckies-out .hero-duckies {
+  visibility: visible;
+  animation: hero-duckies-loop 16s linear infinite both;   /* duration set by duckies.js from the screen width (steady 90px/s) */
+}
+html[data-intro] .hero-fold .hero-duckies img { animation: none; }
+@keyframes hero-duckies-loop {
+  /* one steady lap of exactly one screen width (--run, set by duckies.js); starts parked in the centre.
+     The twin rides one screen width behind, so the part leaving on the right is already entering on the left. */
+  from { transform: translate(calc(-50% + var(--off, 0px))); }
+  to   { transform: translate(calc(-50% + var(--off, 0px) + var(--run, 100vw))); }
+}
+html[data-intro] .hero-fold .hero-duckies.is-twin { --off: calc(-1 * var(--run, 100vw)); }
+
+
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-intro] .hero-fold .hero-duckies { animation: none; transform: translate(-50%); }
+}
+
+/* breathing room between the scooter and the press logos */
+html[data-intro] .logo-strip { margin-top: 48px; }
+/* the scooter is hidden at 820 and below (pills show instead), so no extra space there */
+@media (width <= 820px) { html[data-intro] .logo-strip { margin-top: 0; } }
+
+/* card hover: no full-page colour wash; the hovered card casts a soft glow in its own colour instead */
+html[data-intro] .hero-tint { display: none; }
+@media (hover: hover) and (pointer: fine) {
+  html[data-intro] .hero-card-slot:hover .hero-card {
+    box-shadow: 0 16px 48px -16px color-mix(in srgb, var(--brand) 60%, transparent), inset 0 0 0 1px transparent;
+  }
+}
+html[data-intro] .hero-card:focus-visible {
+  box-shadow: 0 16px 48px -16px color-mix(in srgb, var(--brand) 60%, transparent), inset 0 0 0 1px transparent;
+}
+
+/* card backgrounds: base art only now (doodles moved to a live SVG layer, cards.js) */
+.card-photos .product-card-bg-art { background-image: url(/assets/new-landing/photos-bg-card.svg?v=4); }
+.card-locker .product-card-bg-art { background-image: url(/assets/new-landing/locker-bg.svg?v=3); }
+.card-auth .product-card-bg-art { background-image: url(/assets/new-landing/auth-bg.svg?v=3); }
+/* no zoom on hover */
+html[data-intro] .card:hover .product-card-bg-art,
+html[data-intro] .card:focus-within .product-card-bg-art { transform: none; }
+
+/* the doodles: drawn in on view, a soft light follows the cursor on hover */
+@property --spot { syntax: '<number>'; inherits: true; initial-value: .32; }
+.card-doodles {
+  position: absolute; inset: -16px; width: calc(100% + 32px); height: calc(100% + 32px);
+  pointer-events: none; opacity: .13; overflow: visible; max-width: none; max-height: none;
+  --spot: .32;
+  -webkit-mask-image: radial-gradient(240px circle at var(--mx, 50%) var(--my, 50%), rgba(0,0,0,var(--spot)), rgba(0,0,0,.32));
+          mask-image: radial-gradient(240px circle at var(--mx, 50%) var(--my, 50%), rgba(0,0,0,var(--spot)), rgba(0,0,0,.32));
+  transform: translate(var(--dx, 0px), var(--dy, 0px));
+  transition: --spot .45s cubic-bezier(.22,1,.36,1);
+}
+@media (hover: hover) and (pointer: fine) { .card:hover .card-doodles { --spot: 1; } }
+.card-doodles path {
+  fill: #fff; fill-opacity: 0;
+  stroke: #fff; stroke-width: 3; stroke-linecap: round;
+  stroke-dasharray: var(--l) var(--l); stroke-dashoffset: var(--l);
+}
+.card-doodles.is-drawn path { animation: doodle-draw 1.4s cubic-bezier(.65,0,.35,1) var(--d) forwards; }
+.card-doodles.is-static path { animation: none; fill-opacity: 1; stroke-opacity: 0; stroke-dashoffset: 0; }
+@keyframes doodle-draw {
+  65%  { stroke-dashoffset: 0; fill-opacity: 0; stroke-opacity: 1; }
+  100% { stroke-dashoffset: 0; fill-opacity: 1; stroke-opacity: 0; }
+}
+
+/* headline + app cards sit a little higher in the first screen (was -10svh) */
+@media (width > 820px) { html[data-intro] .hero-inner { top: -18svh; } }
+
+/* intro in: everything blurs into focus in place, all at once (no rise, no movement).
+   The strike, the dot swing and the duckies all start with it at 0.1s. */
+@keyframes hero-blur-in { from { opacity: 0; filter: blur(10px); } to { opacity: 1; filter: blur(0); } }
+html[data-intro] .hero-title .hero-line .hero-word:not(.is-knocked),
+html[data-intro] .hero-title .hero-line .hero-dot {
+  transform: none;
+  animation: none; opacity: 1; filter: none;   /* no blur-in (boss 25 Nov): the headline is just there */
+}
+html[data-intro] .hero-title .hero-line .hero-word-struck.is-knocked { transform: none; }
+html[data-intro] .hero-cards .hero-card-slot { animation: none; opacity: 1; filter: none; }   /* no blur-in (boss 25 Nov) */
+html[data-intro] .hero-cards .hero-card-slot:first-child { animation-delay: .1s; }
+html[data-intro] .hero-cards .hero-card-slot:nth-child(2) { animation-delay: .1s; }
+html[data-intro] .hero-cards .hero-card-slot:nth-child(3) { animation-delay: .1s; }
+/* everything at once: the strike draws while the headline blurs in (dot + duckies start at .1s too) */
+html[data-intro] .hero-title .hero-strike { animation-delay: .1s; }
+/* the strike waits for the dot hit (intro.js adds html.strike-go after it) */
+html[data-intro]:not(.strike-go) .hero-title .hero-strike { animation-play-state: paused; }
+
+/* hero illustration clusters (heroart.js), behind the headline and cards */
+.hero-art { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; overflow: visible; }
+@media (width <= 820px) { .hero-art { display: none; } }
+
+/* Photos: same doodle look as Auth and Locker. Green is lighter, so the white doodles need more opacity to read the same */
+.card-photos .card-doodles { opacity: .22; }
+
+/* the dot hits: a light sweep runs back along the green line and gold stars twinkle around it (hitshine.js) */
+.hero-line-good { position: relative; }
+.hero-hit-fx { position: absolute; pointer-events: none; z-index: 3; }
+.hero-hit-clip { position: absolute; inset: -.08em 0 -.15em; overflow: hidden; }   /* past the tail of the g (line boxes are tighter than the glyphs), short of the black line below */
+.hero-hit-shine {
+  position: absolute; top: 0; bottom: 0; right: 0; width: calc(var(--h) * .9);
+  background: linear-gradient(100deg, transparent 0%, rgba(255,255,255,.45) 50%, transparent 100%);
+  mix-blend-mode: screen; transform: translateX(100%) skewX(-14deg);
+  animation: hero-hit-sweep .75s cubic-bezier(.45,0,.25,1) .06s both;
+}
+@keyframes hero-hit-sweep { to { transform: translateX(calc(-1 * var(--w) - 100%)) skewX(-14deg); } }
+/* the hover sweep runs left to right, with the colour */
+.hero-hit-fx.is-fwd .hero-hit-shine { right: auto; left: 0; transform: translateX(-100%) skewX(-14deg); animation-name: hero-hit-sweep-fwd; }
+@keyframes hero-hit-sweep-fwd { to { transform: translateX(calc(var(--w) + 100%)) skewX(-14deg); } }
+.hero-hit-star {
+  position: absolute; width: var(--s); aspect-ratio: 1; margin: calc(var(--s) / -2) 0 0 calc(var(--s) / -2);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0C12.9 7.6 16.4 11.1 24 12 16.4 12.9 12.9 16.4 12 24 11.1 16.4 7.6 12.9 0 12 7.6 11.1 11.1 7.6 12 0Z' fill='%23FFC21A'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat;
+  scale: 0; animation: hero-hit-star .9s cubic-bezier(.45,0,.35,1) calc(.1s + var(--g)) both;
+}
+/* each star grows from nothing while it turns, then turns on and shrinks back to nothing: never stays */
+@keyframes hero-hit-star {
+  0%   { scale: 0; rotate: -90deg; }
+  45%  { scale: 1; rotate: 0deg; }
+  100% { scale: 0; rotate: 90deg; }
+}
+
+/* reviews: the Ente doodle pattern instead of the photo, white at low opacity on the dark band */
+.testimonials::before {
+  background: url(/assets/new-landing/doodles.svg) 0 0 / 1200px auto repeat;
+  background-position: 0 var(--parallax-bg-y, 0px);
+  opacity: .02;
+}
+/* hover: a soft light follows the cursor and lights up the doodles near it (reviewglow.js) */
+.testimonials::after {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: url(/assets/new-landing/doodles.svg) 0 0 / 1200px auto repeat;
+  background-position: 0 var(--parallax-bg-y, 0px);
+  transform-origin: 50%; transform: scale(1); transition: transform 1.9s cubic-bezier(.22,1,.36,1), opacity .45s cubic-bezier(.22,1,.36,1);
+  opacity: 0;
+  -webkit-mask-image: radial-gradient(280px circle at var(--mx, 50%) var(--my, 50%), #000 0%, rgba(0,0,0,.35) 45%, transparent 100%);
+          mask-image: radial-gradient(280px circle at var(--mx, 50%) var(--my, 50%), #000 0%, rgba(0,0,0,.35) 45%, transparent 100%);
+}
+.testimonials.is-in-view::after { transform: scale(1.5); }
+.testimonials.is-lit::after { opacity: .14; }
+@media (prefers-reduced-motion: reduce) { .testimonials::after { transition: opacity .2s; } .testimonials.is-in-view::after { transform: scale(1); } }
+/* every review card the same height (the build sets flex-start, so short reviews made short cards) */
+.testimonial-track, .testimonial-set { align-items: stretch; }
+.testimonial-track .review-card { height: auto; align-self: stretch; }
+/* review cards: solid and a little darker than the band, so the pattern never shows through */
+.testimonials .review-card { background: #232323; box-shadow: inset 0 0 0 1px rgba(255,255,255,.06); }
+
+/* toys carousel: the side cards fade out softly over a wide, eased edge (a real transparency mask),
+   instead of the narrow white smear laid over a hard cut */
+@media (width > 820px) {
+  .toys-viewport::before, .toys-viewport::after { display: none; }
+  .toys-viewport {
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, rgba(0,0,0,.15) 20px, rgba(0,0,0,.5) 45px, rgba(0,0,0,.85) 70px, #000 90px, #000 calc(100% - 90px), rgba(0,0,0,.85) calc(100% - 70px), rgba(0,0,0,.5) calc(100% - 45px), rgba(0,0,0,.15) calc(100% - 20px), transparent 100%);
+            mask-image: linear-gradient(90deg, transparent 0, rgba(0,0,0,.15) 20px, rgba(0,0,0,.5) 45px, rgba(0,0,0,.85) 70px, #000 90px, #000 calc(100% - 90px), rgba(0,0,0,.85) calc(100% - 70px), rgba(0,0,0,.5) calc(100% - 45px), rgba(0,0,0,.15) calc(100% - 20px), transparent 100%);
+  }
+}
+
+/* reviews pattern drifts a little toward the cursor (reviewglow.js); separate translate so the zoom's slow transition does not lag it */
+.testimonials::before, .testimonials::after { translate: var(--dx, 0px) var(--dy, 0px); }
+
+/* nav bar: stronger frosted blur so busy sections behind it stay quiet */
+.topbar { -webkit-backdrop-filter: blur(44px) saturate(170%); backdrop-filter: blur(44px) saturate(170%); background: rgba(255,255,255,.74); }
+
+/* hero = the headline and the three app cards only, centred in the first screen */
+html[data-intro] .hero-fold { min-height: calc(100svh - 82px); padding-bottom: 0; align-items: center; }
+html[data-intro] .hero-inner { top: 0; padding-top: 0; }
+@media (width > 820px) { html[data-intro] .hero-inner { top: -2svh; } }
+html[data-intro] .hero-pills, html[data-intro] .hero-chevron { display: none; }
+
+/* duckies band right under the hero; duckies.js moves the scooter with the scroll */
+html[data-intro] .duck-band { position: relative; margin-inline: calc(50% - 50vw); height: calc(70vw * 481 / 1324 + 24px); }
+html[data-intro] .duck-band .hero-duckies {
+  position: absolute; left: 0; bottom: 0; z-index: 0;
+  width: 70vw; visibility: visible; animation: none; transform: translate3d(16px, 0, 0);
+  translate: none; scale: none; pointer-events: none; will-change: transform;
+}
+html[data-intro] .duck-band .hero-duckies img { animation: none; }
+/* desktop: tuck the band up toward the hero so the duckies sit closer to the cards */
+@media (width > 820px) { html[data-intro] .duck-band { margin-top: calc(-1 * clamp(40px, 4.5vw, 96px)); } }
+@media (width <= 820px) {
+  html[data-intro] .duck-band { height: calc(96vw * 481 / 1324 + 16px); }
+  html[data-intro] .duck-band .hero-duckies { width: 96vw; display: block; }
+  html[data-intro] .logo-strip { margin-top: 24px; }
+}
+@media (width > 820px) { html[data-intro] .logo-strip { margin-top: 32px; } }
+
+/* Hero fits the screen it is on. On a laptop (short and narrow) the title
+   follows the smaller of width and height, so a 13-inch screen gets a smaller
+   hero than a 32-inch one; the cards follow the title through --hero-k
+   (set by intro.js). Big screens keep the full 6.9rem. */
+@media (width > 820px) {
+  .hero-title { font-size: clamp(3.3rem, min(5.9vw, 10.5vh), 6.9rem); line-height: 1.04; }   /* clear air (~.09em) between the g of "good" and "of the" below it */
+  .hero-cards { zoom: var(--hero-cards-k, 1); }
+}

@@ -1,0 +1,178 @@
+/* Toys: a fanned deck. The front card sits at full size, the previous and
+   next cards are tucked behind it, and every other card is parked under
+   those two. toys.js sets data-slot on each card and --toy-shift on the
+   carousel; everything visual lives here. */
+.toys { padding-bottom: 128px; }
+@media (width <= 820px) { .toys { padding-bottom: 96px; } }
+
+.toys .toys-carousel {
+  --toy-w: min(54vw, 760px);
+  --toy-shift: calc(var(--toy-w) * .22);
+  --toy-ease: cubic-bezier(.23, 1, .32, 1);
+  --toy-time: .5s;
+}
+
+/* The viewport is sized to the deck so the arrows sit right beside it. */
+.toys .toys-viewport {
+  overflow: visible;
+  padding-block: 40px 48px;
+  touch-action: pan-y;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+.toys .toys-viewport::before,
+.toys .toys-viewport::after { display: none; }
+
+/* All cards share one grid cell, so the stack is centred without measuring. */
+.toys .toys-track {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  gap: 0;
+  transition: transform var(--toy-time) var(--toy-ease);
+}
+.toys .is-dragging .toys-track { transition: none; }
+
+.toys .toy-card {
+  grid-area: 1 / 1;
+  position: relative;
+  flex: none;
+  width: var(--toy-w);
+  height: auto;
+  aspect-ratio: 1200 / 630;
+  margin: 0;
+  border-radius: clamp(20px, 2vw, 28px);
+  background: transparent;
+  overflow: hidden;
+  filter: none;
+  opacity: 1;
+  visibility: hidden;
+  z-index: 1;
+  transform: translateX(var(--toy-shift)) rotate(3deg) scale(.8);
+  /* A faint hairline outside the white ring plus an all-round soft shadow,
+     so a white card tucked behind still has an edge on the white page. */
+  box-shadow:
+    0 0 0 2px #fff,
+    0 0 0 3px rgba(0, 0, 0, .07),
+    0 2px 12px rgba(0, 0, 0, .1),
+    0 10px 24px -14px rgba(0, 0, 0, .28);
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform var(--toy-time) var(--toy-ease),
+    box-shadow var(--toy-time) var(--toy-ease),
+    scale .3s ease;
+}
+.toys .toy-card:hover { background: transparent; }
+
+/* Overscan by 2px so a stray transparent edge row in the art never shows. */
+.toys .toy-card .toy-preview,
+.toys .toy-card .toy-preview-contain {
+  position: absolute;
+  inset: -2px;
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  max-width: none;
+  min-height: 0;
+  padding: 0;
+  background: none;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+/* Slots. Rotation and scale are applied around the card's own centre.
+   z-index follows the slot at once. From rest, toys.js keeps the outgoing
+   front card on top for 65ms (data-leaving), when it and the incoming card
+   are the same size on this ease, so the swap reads as one card passing the
+   other. In a fast burst there is no hold, so the front card is always on top. */
+.toys .toy-card[data-slot="0"] {
+  visibility: visible;
+  z-index: 5;
+  transform: none;
+  box-shadow:
+    0 0 0 2px #fff,
+    0 34px 64px -28px rgba(0, 0, 0, .45),
+    0 12px 24px -12px rgba(0, 0, 0, .22),
+    0 0 28px rgba(0, 0, 0, .07);
+}
+.toys .toy-card[data-slot="1"],
+.toys .toy-card[data-slot="-1"] {
+  visibility: visible;
+  z-index: 4;
+}
+.toys .toy-card[data-slot="1"] { transform: translateX(var(--toy-shift)) rotate(3deg) scale(.86); }
+.toys .toy-card[data-slot="-1"] { transform: translateX(calc(-1 * var(--toy-shift))) rotate(-3deg) scale(.86); }
+/* The next card in line waits, fully covered, under each neighbour. */
+.toys .toy-card[data-slot="2"],
+.toys .toy-card[data-slot="-2"] {
+  visibility: visible;
+  z-index: 3;
+}
+.toys .toy-card[data-slot="-2"],
+.toys .toy-card[data-slot="-h"] {
+  transform: translateX(calc(-1 * var(--toy-shift))) rotate(-3deg) scale(.8);
+}
+.toys .toy-card[data-leaving] { z-index: 6; }
+
+@media (hover: hover) and (pointer: fine) {
+  .toys .toy-card[data-slot="0"]:hover { scale: 1.02; }
+  .toys .toy-card:not([data-slot="0"]) { cursor: pointer; }
+}
+
+/* Arrows: same hover ceiling as the cards (1.02 over .3s). */
+.toys .toys-arrow { transition: transform .3s ease, opacity .18s; }
+.toys .toys-arrow:hover:not(:disabled) { transform: scale(1.02); }
+
+@media (width > 820px) {
+  .toys .toys-carousel {
+    width: 100%;
+    margin: clamp(56px, 6vw, 88px) auto 0;
+    grid-template-columns: 44px calc(var(--toy-w) * 1.34) 44px;
+    justify-content: center;
+    gap: 24px;
+  }
+  .toys .toys-arrow { width: 44px; height: 44px; position: relative; z-index: 6; }
+}
+@media (width >= 641px) and (width <= 820px) {
+  /* Bleed evenly to the section edges so the deck sits on the true centre. */
+  .toys .toys-carousel {
+    --toy-w: 62vw;
+    width: auto;
+    margin-inline: calc(-1 * var(--gutter));
+  }
+  /* The base bundle hides the arrows at 820 and below. Bring them back here,
+     laid over the deck's edges so the fan keeps the full width. */
+  .toys .toys-arrow {
+    display: inline-grid;
+    position: absolute;
+    top: calc(50% - 26px);
+    z-index: 6;
+    width: 44px;
+    height: 44px;
+  }
+  .toys .toys-arrow-prev { left: 0; }
+  .toys .toys-arrow-next { right: 0; }
+}
+@media (width <= 820px) {
+  /* The deck bleeds to the screen edge here. Let it reach that edge instead of
+     being cut 10px in by the section; html and body clip x at the screen. */
+  .toys { overflow-x: visible; overflow-y: clip; }
+}
+@media (width <= 640px) {
+  .toys .toys-carousel { --toy-w: 84vw; }
+  .toys .toys-viewport { padding-block: 32px 40px; }
+  .toys .toy-card[data-slot="0"] {
+    box-shadow:
+      0 0 0 2px #fff,
+      0 20px 36px -22px rgba(0, 0, 0, .42),
+      0 6px 14px -8px rgba(0, 0, 0, .18);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toys .toys-track,
+  .toys .toy-card,
+  .toys .toys-arrow { transition: none; }
+}

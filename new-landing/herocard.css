@@ -1,0 +1,211 @@
+/* hero app cards: visual polish (rest state) */
+
+/* card: hairline ring plus a layered soft shadow.
+   layer 1 outer, layer 2 inset, so it eases into the hover glow in intro.css */
+html[data-intro] .hero-cards .hero-card {
+  background-image: linear-gradient(180deg, #fff 40%, #f9f9fa);
+  box-shadow:
+    0 1px 2px rgba(17, 17, 26, .05),
+    inset 0 0 0 1px rgba(17, 17, 26, .07),
+    0 6px 12px -4px rgba(17, 17, 26, .06),
+    0 20px 40px -14px rgba(17, 17, 26, .14);
+}
+
+/* icon: 80px tall, 14px from top, bottom and left (card radius 34 minus 14 = 20, near the tile radius) */
+html[data-intro] .hero-cards .hero-card .hero-card-icon img {
+  width: 86.5px;
+  top: 14px;
+  left: 14px;
+}
+/* photos art is square, so it is narrower; same 14px edges */
+html[data-intro] .hero-cards .hero-card-photos .hero-card-icon img {
+  width: 79px;
+}
+
+/* text block: the name; "Learn more" slides in under it on hover */
+html[data-intro] .hero-cards .hero-card .hero-card-text {
+  left: 114px;
+  gap: 3px;
+}
+html[data-intro] .hero-cards .hero-card-photos .hero-card-text {
+  left: 110px;
+}
+html[data-intro] .hero-cards .hero-card .hero-card-name {
+  font-size: 23.5px;
+  letter-spacing: -.035em;
+  line-height: 1.1;
+}
+html[data-intro] .hero-cards .hero-card .hero-card-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: rgba(5, 5, 5, .56);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -.005em;
+  line-height: 1.4;
+  opacity: 0;            /* hidden at rest: only shows on hover / focus */
+  max-height: 0;
+  overflow: hidden;
+  transform: translateY(4px);
+  transition: color .26s cubic-bezier(.25, .8, .25, 1), opacity .3s ease, max-height .4s cubic-bezier(.22, 1, .36, 1), transform .4s cubic-bezier(.22, 1, .36, 1);
+}
+/* small chevron drawn in CSS */
+html[data-intro] .hero-cards .hero-card .hero-card-more::after {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-top: 1.6px solid currentColor;
+  border-right: 1.6px solid currentColor;
+  transform: rotate(45deg);
+  margin-top: 1px;
+  transition: transform .26s cubic-bezier(.25, .8, .25, 1);
+}
+
+/* hover and keyboard focus: same pop as before, restated from the new rest box */
+@media (hover: hover) and (pointer: fine) {
+  html[data-intro] .hero-cards .hero-card-slot:hover .hero-card .hero-card-icon img {
+    transform: translate(-26.4px, -40px) rotate(11.4deg) scale(1.66);
+  }
+  html[data-intro] .hero-cards .hero-card-slot:hover .hero-card-photos .hero-card-icon img {
+    transform: translate(-26.5px, -39px) rotate(11.4deg) scale(1.66);
+  }
+  html[data-intro] .hero-cards .hero-card-slot:hover .hero-card .hero-card-text {
+    transform: translate(30px, -50%);
+  }
+  html[data-intro] .hero-cards .hero-card-slot:hover .hero-card-photos .hero-card-text {
+    transform: translate(34px, -50%);
+  }
+  html[data-intro] .hero-cards .hero-card-slot:hover .hero-card .hero-card-more {
+    color: #fff; opacity: 1; max-height: 2em; overflow: visible; transform: none;
+  }
+  html[data-intro] .hero-cards .hero-card-slot:hover .hero-card .hero-card-more::after {
+    transform: translateX(2px) rotate(45deg);
+  }
+}
+html[data-intro] .hero-cards .hero-card:focus-visible .hero-card-icon img {
+  transform: translate(-26.4px, -40px) rotate(11.4deg) scale(1.66);
+}
+html[data-intro] .hero-cards .hero-card-photos:focus-visible .hero-card-icon img {
+  transform: translate(-26.5px, -39px) rotate(11.4deg) scale(1.66);
+}
+html[data-intro] .hero-cards .hero-card:focus-visible .hero-card-text {
+  transform: translate(30px, -50%);
+}
+html[data-intro] .hero-cards .hero-card-photos:focus-visible .hero-card-text {
+  transform: translate(34px, -50%);
+}
+html[data-intro] .hero-cards .hero-card:focus-visible {
+  box-shadow: 0 16px 48px -16px color-mix(in srgb, var(--brand) 60%, transparent), inset 0 0 0 1px transparent;
+}
+html[data-intro] .hero-cards .hero-card:focus-visible .hero-card-more {
+  color: #fff; opacity: 1; max-height: 2em; overflow: visible; transform: none;
+}
+html[data-intro] .hero-cards .hero-card:focus-visible .hero-card-more::after {
+  transform: translateX(2px) rotate(45deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-intro] .hero-cards .hero-card .hero-card-more,
+  html[data-intro] .hero-cards .hero-card .hero-card-more::after { transition-duration: 10ms; }
+}
+
+/* Photos card, desktop: the phone breaks out of the top on purpose, but at the
+   bottom right it must follow the card's own rounded corner, not stick out past
+   it. Clip the card (not the floating phone, so the edge never bobs): open above
+   and to the left, straight right edge, rounded bottom-right like the card. */
+/* The clip sits on a still wrapper around the phone, not on the card: on the card it also cut the card's
+   drop shadow into a hard line above the corner. */
+.card-photos .photo-clip { position: absolute; inset: 0; pointer-events: none; }
+.card-photos .photo-clip > * { pointer-events: auto; }
+@media (width > 820px) {
+  .card-photos .photo-clip { clip-path: inset(-100vh 0 0 -100vw round 0 0 var(--radius-xl, 32px) 0); }
+}
+
+/* Product art: settle in once, then stay still (no idle float). */
+.card-photos.reveal-on-scroll.is-visible .photo-device { animation: 1.35s cubic-bezier(.22,1,.36,1) .16s both photo-creative-place; }
+.card-locker.reveal-on-scroll.is-visible .locker-device { animation: 1.3s cubic-bezier(.22,1,.36,1) .14s both locker-creative-place; }
+.card-auth.reveal-on-scroll.is-visible .auth-device { animation: 1.3s cubic-bezier(.22,1,.36,1) .28s both auth-creative-place; }
+@media (width <= 820px) {
+  .card-photos.reveal-on-scroll.is-visible .photo-device { animation: 1.35s cubic-bezier(.22,1,.36,1) .16s both photo-creative-place-mobile; }
+}
+
+/* Photos: a hand holding a phone is never perfectly still. A small, slow
+   drift pivoting at the wrist (bottom right), on rotate + translate so it
+   never fights the transform used by the settle-in. Two lengths that don't
+   line up, so it never reads as a loop. */
+@keyframes photo-hand-tilt { 0%, 100% { rotate: 0deg; } 35% { rotate: -.7deg; } 70% { rotate: .35deg; } }
+@keyframes photo-hand-shift { 0%, 100% { translate: 0 0; } 50% { translate: -3px -4px; } }
+.card-photos.reveal-on-scroll.is-visible .photo-device {
+  transform-origin: 78% 100%;
+  animation:
+    1.35s cubic-bezier(.22,1,.36,1) .16s both photo-creative-place,
+    7.4s cubic-bezier(.45,0,.55,1) 1.6s infinite photo-hand-tilt,
+    9.7s cubic-bezier(.45,0,.55,1) 1.6s infinite photo-hand-shift;
+}
+@media (width <= 820px) {
+  .card-photos.reveal-on-scroll.is-visible .photo-device {
+    animation:
+      1.35s cubic-bezier(.22,1,.36,1) .16s both photo-creative-place-mobile,
+      7.4s cubic-bezier(.45,0,.55,1) 1.6s infinite photo-hand-tilt,
+      9.7s cubic-bezier(.45,0,.55,1) 1.6s infinite photo-hand-shift;
+  }
+}
+
+/* Auth: the new art is landscape and the phone runs off the right edge by
+   design, so it sits flush with the card's right side. */
+@media (width > 820px) {
+  .card-auth .auth-device { width: 138%; right: -38%; bottom: 6%; }
+  .card-auth { clip-path: inset(-100vh 0 0 -100vw round 0 0 var(--radius-xl, 32px) 0); }
+}
+@media (width <= 820px) {
+  .card-auth .auth-device { width: calc(100% + 22px); margin-right: -22px; }
+}
+
+/* Auth: its "e" sits ~22px further left in the artwork than Locker's, so the shared pop
+   pushed it out of the pill's top-left. Same pop, landed a little right and lower. */
+@media (hover: hover) and (pointer: fine) {
+  html[data-intro] .hero-cards .hero-card-slot:hover .hero-card-auth .hero-card-icon img {
+    transform: translate(-20px, -35px) rotate(11.4deg) scale(1.66);
+  }
+}
+html[data-intro] .hero-cards .hero-card-auth:focus-visible .hero-card-icon img {
+  transform: translate(-20px, -35px) rotate(11.4deg) scale(1.66);
+}
+
+/* Photos card: the SVG base art has its own 39px corner and a grey stroke, so at the card's
+   32px corner the brighter card fill peeked out. Draw the base in CSS instead, on the card's radius. */
+.card-photos .product-card-bg-art {
+  background: radial-gradient(ellipse 95% 150% at 38% 57%, #08c225, #33dd4e);
+  border-radius: inherit;
+}
+.card-photos { background-color: #08c225; }
+
+/* Duck band: first paint is off the left edge, so the scooter never flashes
+   at rest on reload. duckies.js writes an inline transform that wins. */
+html[data-intro] body .duck-band .hero-duckies { transform: translate3d(-120vw, 0, 0); }
+
+/* Duck band ride, driven by the scroll itself (runs on the compositor, locked to the page, no JS lag).
+   Same path duckies.js used: linear in the band's view progress, lead duck on the centre line at 50%.
+   Desktop box 70vw, phone 96vw; LEAD .87, nose at the left edge at 14%. */
+@supports (animation-timeline: view()) {
+  html[data-intro] .duck-band { view-timeline: --duckride block; }
+  @keyframes duck-ride { from { transform: translate3d(var(--ride-0), 0, 0); } to { transform: translate3d(var(--ride-1), 0, 0); } }
+  html[data-intro] body .duck-band .hero-duckies {
+    --ride-0: calc(-92.98vw - 11.11px); --ride-1: calc(71.18vw + 11.11px);
+    animation: duck-ride 1s linear both; animation-timeline: --duckride; animation-range: cover 0% cover 100%;
+  }
+  @media (width <= 820px) {
+    html[data-intro] body .duck-band .hero-duckies { --ride-0: calc(-120.3vw - 11.11px); --ride-1: calc(53.26vw + 11.11px); }
+  }
+}
+
+/* hover text (name + Learn more) centred between the visible tile edge and the white rim, per card (measured by pixels) */
+@media (hover: hover) and (pointer: fine) {
+  html[data-intro] .hero-cards .hero-card-slot:hover .hero-card-photos .hero-card-text { transform: translate(21px, -50%); }
+  html[data-intro] .hero-cards .hero-card-slot:hover .hero-card-locker .hero-card-text { transform: translate(22px, -50%); }
+  html[data-intro] .hero-cards .hero-card-slot:hover .hero-card-auth .hero-card-text { transform: translate(24.6px, -50%); }
+}
+html[data-intro] .hero-cards .hero-card-photos:focus-visible .hero-card-text { transform: translate(21px, -50%); }
+html[data-intro] .hero-cards .hero-card-locker:focus-visible .hero-card-text { transform: translate(22px, -50%); }
+html[data-intro] .hero-cards .hero-card-auth:focus-visible .hero-card-text { transform: translate(24.6px, -50%); }

@@ -1,0 +1,75 @@
+/* Phone hero pills: the card in the middle of the row is the selected one.
+   mobile-pills.js marks the row with .has-pick and the centred card with .is-selected.
+   Every rule is phone only, and the selected look waits for .has-pick, so without the script the row looks as before. */
+@media (width <= 820px) {
+
+  /* every card can land in the middle: side padding of half the screen minus half a card (232 / 2 = 116, 2px spare) */
+  html[data-intro] body .hero-cards {
+    /* cards at .74 (was .956): half a card is 90px */
+    padding-left: calc(50vw - 90px);
+    padding-right: calc(50vw - 90px);
+    margin-top: clamp(-6px, 3svh - 18px, 8px);
+    padding-top: 18px;
+    padding-bottom: 96px;            /* the selected glow reaches ~56px below the card, the arc drops side cards ~20px */
+    margin-bottom: -72px;            /* same spot for what follows */
+    scroll-snap-type: none;   /* the cards use zoom, which throws CSS snap off centre; mobile-pills.js glides the nearest card to the middle instead */
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 32px, #000 calc(100% - 32px), transparent);
+            mask-image: linear-gradient(to right, transparent, #000 32px, #000 calc(100% - 32px), transparent);
+  }
+  html[data-intro] body .hero-cards .hero-card-slot { scroll-snap-align: none; zoom: .74; }
+
+  /* opacity .5 and scale .94 on the side cards; the state lives on the card (a), not the slot: the slot's intro animation owns its opacity and transform */
+  html[data-intro] body .hero-cards.has-pick .hero-card {
+    transition: transform .3s ease, opacity .3s ease, background-color .3s ease, box-shadow .3s ease;
+  }
+
+  /* cards off the centre sit back */
+  html[data-intro] body .hero-cards.has-pick .hero-card:not(.is-selected) {
+    opacity: .55;
+    transform: rotate(var(--tilt)) scale(.94);
+  }
+
+  /* the centred card wears the desktop hover look: brand fill inside a white rim, the icon pops big, white name */
+  html[data-intro] body .hero-cards.has-pick .hero-card.is-selected {
+    opacity: 1;
+    transform: rotate(-2.2deg) scale(1.02);
+    box-shadow: 0 16px 48px -16px color-mix(in srgb, var(--brand) 60%, transparent), inset 0 0 0 1px transparent;
+  }
+  html[data-intro] body .hero-cards.has-pick .hero-card.is-selected::before { opacity: 1; }
+  html[data-intro] body .hero-cards.has-pick .hero-card.is-selected .hero-card-icon { clip-path: inset(8px round 26px); }
+  html[data-intro] body .hero-cards.has-pick .hero-card.is-selected .hero-card-icon img { transform: translate(-26.4px, -40px) rotate(11.4deg) scale(1.66); }   /* smaller than desktop's 1.988 so the tile ends before the name */
+  html[data-intro] body .hero-cards.has-pick .hero-card-photos.is-selected .hero-card-icon img { transform: translate(-26.5px, -39px) rotate(11.4deg) scale(1.66); }
+  html[data-intro] body .hero-cards.has-pick .hero-card-auth.is-selected .hero-card-icon img { transform: translate(-20px, -35px) rotate(11.4deg) scale(1.66); }
+  /* each name centred in the colour between the tile and the white rim */
+  html[data-intro] body .hero-cards.has-pick .hero-card-locker.is-selected .hero-card-text { transform: translate(24.3px, -50%); }
+  html[data-intro] body .hero-cards.has-pick .hero-card-auth.is-selected .hero-card-text { transform: translate(38px, -50%); }
+  html[data-intro] body .hero-cards.has-pick .hero-card-photos.is-selected .hero-card-text { transform: translate(22.3px, -50%); }
+  html[data-intro] body .hero-cards.has-pick .hero-card.is-selected .hero-card-name { color: #fff; }
+  html[data-intro] body .hero-cards.has-pick .hero-card .hero-card-more { display: none; }   /* phone: name only, no "Learn more" */
+
+  /* the arc: mobile-pills.js drops and tilts each card by how far it sits from the middle (translate + rotate, which
+     stack on top of the slot's own intro transform); this just lets the move ease between frames */
+  html[data-intro] body .hero-cards.has-pick .hero-card-slot { transform-origin: 50% 50%; }
+
+  /* the headline follows the selected app: mobile-pills.js sets --pick-c on <html> (Locker blue, Auth purple, Photos stays green) */
+  html.pick-tint .hero-line-good .hl.is-green,
+  html.pick-tint .hero-line-good .hero-dot.is-green,
+  html.pick-tint .hero-dot.is-green { color: var(--pick-c); transition: color .3s cubic-bezier(.23,1,.32,1) calc(var(--i, 0) * 14ms); }
+
+  @media (prefers-reduced-motion: reduce) {
+    html.pick-tint .hero-line-good .hl.is-green, html.pick-tint .hero-dot.is-green { transition: none; }
+    html[data-intro] body .hero-cards.has-pick .hero-card,
+    html[data-intro] body .hero-cards.has-pick .hero-card::before,
+    html[data-intro] body .hero-cards.has-pick .hero-card .hero-card-icon,
+    html[data-intro] body .hero-cards.has-pick .hero-card .hero-card-icon img,
+    html[data-intro] body .hero-cards.has-pick .hero-card .hero-card-text,
+    html[data-intro] body .hero-cards.has-pick .hero-card .hero-card-more { transition-duration: 10ms; }
+    html[data-intro] body .hero-cards.has-pick .hero-card:not(.is-selected) { transform: rotate(var(--tilt)); }
+    html[data-intro] body .hero-cards.has-pick .hero-card.is-selected { transform: rotate(-2.2deg); }
+  }
+}
+
+/* a mouse on a narrow window: hover never goes past 1.02 */
+@media (width <= 820px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  html[data-intro] body .hero-cards.has-pick .hero-card-slot:hover .hero-card { opacity: 1; transform: rotate(var(--tilt)) scale(1.02); }
+}

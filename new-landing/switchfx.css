@@ -1,0 +1,89 @@
+/* switch: a centred stage. Two phones lean in from the edges, an arrow arcs between them and
+   photos fly from the old cloud (left) into Ente (right). Text and one button in the middle. (switchfx.js) */
+@media (width > 820px) {
+  .switch.is-stage {
+    overflow: visible; text-align: center;   /* phones may reach past the section edge (kept inside the window by switchfx.js) */
+    min-height: clamp(760px, 64vw, 1080px);
+    padding-top: clamp(240px, 22vw, 360px); padding-bottom: clamp(120px, 11vw, 190px);
+  }
+  .switch.is-stage h2 { margin-inline: auto; }
+  .switch.is-stage .eyebrow { margin-inline: auto; }
+  /* boss: the import card sits right under the headline, the guide button under the card */
+  .switch.is-stage { display: flex; flex-direction: column; }
+  .switch.is-stage .card-actions { justify-content: center; order: 2; margin-top: 40px; }
+  .switch.is-stage .card-actions .button-dark { display: none; }   /* one button in the middle: See migration guide */
+  /* the import card: a flat white card on a solid side, like the tiles, under the button */
+  .switch.is-stage .import-panel {
+    position: relative; z-index: 3; aspect-ratio: auto; overflow: visible; isolation: auto;
+    width: min(760px, 54vw); margin: clamp(96px, 7.5vw, 128px) auto 0;   /* a lane for the photos' arch between headline and card */ padding: 0; border-radius: 28px; text-align: left;
+  }
+  .switch.is-stage .import-panel::before { display: none; }
+  .switch.is-stage .import-panel .upload-demo {
+    border-radius: 28px; padding: 26px 30px 0; font-size: 18px;
+    box-shadow: inset 0 0 0 1.5px #e8e8ee, 0 10px 0 #e3e3ea;   /* hairline edge and a solid side, no blur */
+    opacity: 1; transform: none; animation: none;
+  }
+  .switch.is-stage .import-panel.reveal-on-scroll .upload-demo { opacity: 0; transform: translateY(28px); transition: opacity .5s ease, transform .7s cubic-bezier(.22,1,.36,1); }
+  .switch.is-stage .import-panel.reveal-on-scroll.is-visible .upload-demo { opacity: 1; transform: none; animation: none; }
+  .switch.is-stage .upload-demo-header h3 { font-size: clamp(22px, 1.9vw, 28px); letter-spacing: -.02em; }
+  .switch.is-stage .upload-demo-summary { grid-template-columns: minmax(0, 1fr) 168px; gap: 28px; padding-top: 18px; }
+  .switch.is-stage .upload-demo-summary strong { font-size: clamp(34px, 3vw, 44px); }
+  .switch.is-stage .upload-demo-summary p { font-size: 17px; margin: 2px 0 16px; }
+  .switch.is-stage .upload-demo-caption { font-size: 16px; }
+  .switch.is-stage .upload-demo-summary > div:first-child { padding-bottom: 26px; }
+  /* the bar: a flat track, the fill with its own darker bottom edge */
+  .switch.is-stage .upload-track { height: 16px; background: #efeff3; box-shadow: inset 0 2px 0 #e2e2e8; }
+  .switch.is-stage .upload-fill { background: #1cc22c; box-shadow: inset 0 -4px 0 #12a020; min-width: 16px; }
+  .switch.is-stage .upload-demo-mascot { width: 168px; height: 208px; top: -24px; }   /* off the card floor: same air below as the text has at the side */
+  .switch.is-stage .upload-demo-mascot img { width: 168px; }
+  .switch.is-stage .upload-demo-mascot .duck-sleep { height: 208px; }
+  .switch.is-stage .upload-demo-mascot .duck-done { height: 172px; }
+  .switch.is-stage > .sw-phone, .switch.is-stage > .sw-art { position: absolute; }
+
+  /* the two phones are drawn illustrations (GPT, flat 3D in perspective); switchfx.js sizes and places them off the headline */
+  .sw-phone { z-index: 1; width: var(--pw, 300px); pointer-events: none; }
+  .sw-phone > img { display: block; width: 100%; height: auto; }
+  /* idle float, like objects hanging in the air: a slow bob and a small sway, the two phones out of step */
+  .sw-phone { animation: sw-float 5.2s ease-in-out infinite alternate; }
+  .sw-phone.is-right { animation-duration: 4.6s; animation-delay: -2.1s; }
+  @keyframes sw-float { from { translate: 0 -7px; rotate: -1.2deg; } to { translate: 0 7px; rotate: 1.2deg; } }
+  @media (prefers-reduced-motion: reduce) { .sw-phone { animation: none; } }
+  /* the Ente screen's portal: a flat rect mapped onto the drawn screen with a matrix3d, its spiral turning inside */
+  .sw-pq { position: absolute; left: 0; top: 0; width: 1000px; height: 2100px; transform-origin: 0 0; overflow: hidden; border-radius: 9% / 4.3%; pointer-events: none; }
+  .sw-pq { background: transparent; }
+  /* screen slots: each landed item sits here as a flat tile in the Ducky line style */
+  .sw-pq i { position: absolute; width: 220px; height: 220px; box-sizing: border-box; border-radius: 26%; background: var(--cf, #ccc); border: var(--pqb, 21px) solid #222; opacity: 0; scale: .4; transition: opacity .12s, scale .38s cubic-bezier(.34, 1.56, .64, 1); }
+  .sw-pq i::after { content: ""; position: absolute; inset: 20%; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect x='2' y='4' width='36' height='32' rx='7' fill='none' stroke='%23fff' stroke-width='4'/%3E%3Ccircle cx='26' cy='14' r='4' fill='%23fff'/%3E%3Cpath d='M4 32 L15 20 L23 28 L28 23 L36 32Z' fill='%23fff'/%3E%3C/svg%3E") center / contain no-repeat; }
+  .sw-pq i[data-k="code"]::after { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath d='M20 3 L35 9 V19 C35 28 28 34 20 37 C12 34 5 28 5 19 V9 Z' fill='none' stroke='%23fff' stroke-width='4' stroke-linejoin='round'/%3E%3Ccircle cx='13.5' cy='20' r='2.6' fill='%23fff'/%3E%3Ccircle cx='20' cy='20' r='2.6' fill='%23fff'/%3E%3Ccircle cx='26.5' cy='20' r='2.6' fill='%23fff'/%3E%3C/svg%3E"); }
+  .sw-pq i[data-k="doc"]::after { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath d='M9 3 H24 L32 11 V37 H9 Z' fill='none' stroke='%23fff' stroke-width='4' stroke-linejoin='round'/%3E%3Cpath d='M15 20 H26 M15 28 H26' stroke='%23fff' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E"); }
+  .sw-pq i.is-in { opacity: 1; scale: 1; }
+  /* encrypted: a beat after it lands, the file's glyph pops into a lock */
+  .sw-pq i.is-locked::after { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath d='M13 19 V13 A7 7 0 0 1 27 13 V19' fill='none' stroke='%23fff' stroke-width='4' stroke-linecap='round'/%3E%3Cpath fill='%23fff' fill-rule='evenodd' d='M12 18 H28 A4 4 0 0 1 32 22 V33 A4 4 0 0 1 28 37 H12 A4 4 0 0 1 8 33 V22 A4 4 0 0 1 12 18 Z M17.5 25.5 A2.5 2.5 0 1 0 22.5 25.5 A2.5 2.5 0 1 0 17.5 25.5 Z M18.8 27 H21.2 V31.5 H18.8 Z'/%3E%3C/svg%3E"); animation: sw-lock .34s cubic-bezier(.34, 1.56, .64, 1) both; }
+  @keyframes sw-lock { from { scale: .2; opacity: 0; } to { scale: 1; opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .sw-pq i { transition: none; } .sw-pq i.is-locked::after { animation: none; } }
+  .sw-art { z-index: 4;   /* the photos fly in front of the import card (z 3), never slip behind its edge */
+     inset: 0; pointer-events: none; perspective: 1000px; }
+  .sw-art svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .sw-arrow { display: none; }   /* no drawn arrow: the flight itself is the path */
+  .sw-arrow-old { fill: none; stroke: #151515; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+  .sw-photo {
+    position: absolute; left: 0; top: 0; width: var(--t, 96px); aspect-ratio: 1; margin: calc(var(--t, 96px) / -2) 0 0 calc(var(--t, 96px) / -2);
+    border-radius: 24%; background: var(--cf);   /* solid side set per frame in switchfx.js */
+    opacity: 0; will-change: transform, opacity;
+  }
+  /* a sun and hills so each tile reads as a photo (placeholders until the real photos come) */
+  /* white glyph per kind, like an app icon: photo (Photos), code (Auth), document (Locker) */
+  .sw-photo::after { content: ""; position: absolute; inset: 22%; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect x='2' y='4' width='36' height='32' rx='7' fill='none' stroke='%23fff' stroke-width='4'/%3E%3Ccircle cx='26' cy='14' r='4' fill='%23fff'/%3E%3Cpath d='M4 32 L15 20 L23 28 L28 23 L36 32Z' fill='%23fff'/%3E%3C/svg%3E") center / contain no-repeat; }
+  .sw-photo[data-k="code"]::after { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath d='M20 3 L35 9 V19 C35 28 28 34 20 37 C12 34 5 28 5 19 V9 Z' fill='none' stroke='%23fff' stroke-width='4' stroke-linejoin='round'/%3E%3Ccircle cx='13.5' cy='20' r='2.6' fill='%23fff'/%3E%3Ccircle cx='20' cy='20' r='2.6' fill='%23fff'/%3E%3Ccircle cx='26.5' cy='20' r='2.6' fill='%23fff'/%3E%3C/svg%3E"); }
+  .sw-photo[data-k="doc"]::after { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath d='M9 3 H24 L32 11 V37 H9 Z' fill='none' stroke='%23fff' stroke-width='4' stroke-linejoin='round'/%3E%3Cpath d='M15 20 H26 M15 28 H26' stroke='%23fff' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E"); }
+
+}
+@media (width <= 820px) { .sw-phone, .sw-art { display: none; } }
+
+/* upload card Ducky from Rive (uploadducky.js); the two SVGs stay as the fallback until it loads */
+.upload-demo-mascot .duck-rive { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity .22s; }
+.upload-demo-mascot.has-rive .duck-rive { opacity: 1; }
+.upload-demo-mascot.has-rive.is-rive-swap .duck-rive { opacity: 0; }
+.upload-demo-mascot.has-rive img { visibility: hidden; }
+/* boss: the Switch buttons just sit there, no scroll reveal (every width) */
+.switch .card-actions.reveal-on-scroll { opacity: 1; transform: none; transition: none; will-change: auto; }
