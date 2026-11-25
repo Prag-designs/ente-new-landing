@@ -40,8 +40,8 @@
     if (done !== doneShown) { doneShown = done; up('mascot').classList.toggle('is-done', done); up('announcement').textContent = done ? 'Upload complete. All 62,247 items uploaded.' : ''; }
   };
   const SLOTS = 18;      // photos per phone screen (3 x 6)
-  const EVERY = 1.05;    // s between photos leaving
-  const FLIGHT = 3.6;    // s along the arc
+  const EVERY = .6;     // s between photos leaving (boss: faster)
+  const FLIGHT = 2.2;    // s along the arc (boss: faster)
   const IN_AIR = Math.ceil(FLIGHT / EVERY) + 1;
 
   // ---- phones: drawn illustrations. Screen corners measured off each image (fractions of its box),
@@ -219,7 +219,7 @@
         f.el.style.opacity = '0'; flights.splice(i, 1);
         want = BASE + (1 - BASE) * (landed + 1) / SLOTS;
         { const tl = tiles[f.slot % 18]; tl.dataset.k = f.el.dataset.k; tl.style.setProperty('--cf', f.el.style.getPropertyValue('--cf')); tl.classList.remove('is-locked'); tl.classList.add('is-in'); setTimeout(() => tl.classList.contains('is-in') && tl.classList.add('is-locked'), 380); }   // lands, then turns into a lock: encrypted
-        if (++landed === SLOTS) setTimeout(reset, 2600);   // a beat to enjoy the awake duck
+        if (++landed === SLOTS) setTimeout(reset, 1800);   // a beat to enjoy the awake duck
       } else place(f.el, k, f.slot);
     }
     if (Math.abs(want - shown) > .0005) { shown += (want - shown) * (want < shown ? .25 : .08); paint(); } else if (shown !== want) { shown = want; paint(); }

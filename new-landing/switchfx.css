@@ -34,7 +34,7 @@
   /* the bar: a flat track, the fill with its own darker bottom edge */
   .switch.is-stage .upload-track { height: 16px; background: #efeff3; box-shadow: inset 0 2px 0 #e2e2e8; }
   .switch.is-stage .upload-fill { background: #1cc22c; box-shadow: inset 0 -4px 0 #12a020; min-width: 16px; }
-  .switch.is-stage .upload-demo-mascot { width: 168px; height: 208px; top: -24px; }   /* off the card floor: same air below as the text has at the side */
+  .switch.is-stage .upload-demo-mascot { width: 168px; height: 208px; top: -44px; }   /* off the card floor: same air below as the text has at the side */
   .switch.is-stage .upload-demo-mascot img { width: 168px; }
   .switch.is-stage .upload-demo-mascot .duck-sleep { height: 208px; }
   .switch.is-stage .upload-demo-mascot .duck-done { height: 172px; }
