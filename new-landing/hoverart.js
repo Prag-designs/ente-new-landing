@@ -11,7 +11,7 @@
   const ART = '/assets/new-landing/hoverart/';
   // coloured illustrations (GPT-drawn, thick black outline, thin white rim, flat body, darker side, no highlights).
   // width / height of each trimmed image
-  const AR = {camera: 1.3161, polaroid: 0.8256, filmroll: 1.3211, frame: 1.2512, cloud: 1.3404, heart: 1.0325, album: 0.7766, mappin: 0.7298, shield: 0.8860, lock: 0.7868, fingerprint: 0.9617, codephone: 0.6913, keys: 0.8009, otp: 1.5595, stopwatch: 0.7883, qrcode: 1.0064, vault: 1.2339, passport: 0.8386, docfolder: 1.3599, password: 2.2115, diploma: 1.8955, idcard: 1.4055, housedeed: 0.8406, medical: 0.8145};
+  const AR = {camera: 1.3153, polaroid: 0.8306, filmroll: 1.3229, frame: 1.2514, cloud: 1.3314, heart: 1.0336, album: 0.7769, mappin: 0.7306, shield: 0.8857, lock: 0.7983, fingerprint: 0.961, codephone: 0.6903, keys: 0.8004, otp: 1.5611, stopwatch: 0.7889, qrcode: 1.0047, vault: 1.2339, passport: 0.8386, docfolder: 1.3599, password: 2.2115, diploma: 1.8955, idcard: 1.4055, housedeed: 0.8406, medical: 0.8145};
 
   // ---- composition: four pieces per side, placed by hand like stickers thrown around a title. Every product and
   // side has its own arrangement (a pair up top, a pair at the bottom, a loose arc, a sweep), so there are no
@@ -45,6 +45,16 @@
     locker: ['vault', 'password', 'passport', 'idcard', 'docfolder', 'housedeed', 'medical', 'diploma'],
   };
 
+  // the boss's own layouts, placed by hand at 14 inch (1512 x 860): icon centre x/y and width in px, tilt in degrees.
+  // Other laptop sizes keep each icon's place relative to the headline (x between screen edge and headline, y down the
+  // fold) and scale it with the headline. Big monitors over 2200 wide keep the eight-piece table.
+  const HAND_F = { w: 1512, top: 82, h: 778, l: 363.39, r: 1150.49 };
+  const HAND = {
+    auth:   [['shield', 260, 189, 115, 6], ['codephone', 155, 433, 126, -16], ['stopwatch', 254, 688, 132, -15], ['keys', 1250, 206, 129, -6], ['fingerprint', 1378, 436, 128, 5], ['otp', 1285, 719, 219, 16]],
+    locker: [['password', 232, 206, 227, -25], ['vault', 171, 473, 156, -5], ['idcard', 260, 744, 158, -23], ['housedeed', 1297, 242, 131, -11], ['diploma', 1346, 470, 192, 5], ['medical', 1249, 717, 117, 14]],
+    photos: [['frame', 236, 232, 160, -26], ['heart', 173, 483, 139, -16], ['camera', 240, 704, 138, -8], ['cloud', 1282, 207, 148, 13], ['filmroll', 1345, 447, 152, 11], ['album', 1273, 697, 115, 23]],
+  };
+
   const svg = document.createElementNS(NS, 'svg');
   svg.setAttribute('class', 'hero-hoverart'); svg.setAttribute('aria-hidden', 'true');
   fold.insertBefore(svg, fold.firstChild);
@@ -57,37 +67,43 @@
     [[scatter(name, 0), 0], [scatter(name, 1), 1]].forEach(([slots, side]) => slots.forEach(([u, v, s, tilt, d], i) => {
       const art = list[side * PER + i], ar = AR[art], x = u * 300, y = v * 420;
       const outer = document.createElementNS(NS, 'g'), inner = document.createElementNS(NS, 'g'), img = document.createElementNS(NS, 'image');
-      img.setAttribute('href', ART + 't-' + name + '-' + art + (VEC.has(name + '-' + art) ? '.svg?v=2' : '.webp?v=4'));   // each set drawn in its product's colour; bump to refetch
+      img.setAttribute('href', ART + 't-' + name + '-' + art + (VEC.has(name + '-' + art) ? '.svg?v=6' : '.webp?v=4'));   // each set drawn in its product's colour; bump to refetch
       inner.appendChild(img); outer.appendChild(inner); outer.setAttribute('opacity', '0');
       g.appendChild(outer);
       const draw = w => { draw.w = w; const h = w / ar; img.setAttribute('width', w.toFixed(1)); img.setAttribute('height', h.toFixed(1)); img.setAttribute('x', (-w / 2).toFixed(1)); img.setAttribute('y', (-h / 2).toFixed(1)); };
-      items.push({ role: i === 2 ? 'main' : 'obj', side, u, vv: v, x, y, s, d, tilt, ar, draw, outer, inner, p: 0, v: 0,
+      items.push({ art, role: i === 2 ? 'main' : 'obj', side, u, vv: v, x, y, s, d, tilt, ar, draw, outer, inner, p: 0, v: 0, T: { u, vv: v, s, d, tilt },
         ph: (x * 7 + y * 13) % 6.28, w: .6 + ((x + y) % 50) / 100, rot: 3 + (x % 3) });
     }));
     sets[name] = { g, items, target: 0, since: 0, mode: 'down' };
   }
 
   // ---- spread each side's pieces over its whole zone ----
-  let ok = false;
-  const layout = () => {
-    const f = fold.getBoundingClientRect();
-    // the headline's real text box (the h1 itself is wider than its words)
-    const t = { left: Infinity, right: -Infinity, top: Infinity, bottom: -Infinity };
-    const tw = document.createTreeWalker(title, NodeFilter.SHOW_TEXT);
-    for (let n; (n = tw.nextNode());) { const rg = document.createRange(); rg.selectNodeContents(n); for (const r of rg.getClientRects()) if (r.width) { t.left = Math.min(t.left, r.left); t.right = Math.max(t.right, r.right); t.top = Math.min(t.top, r.top); t.bottom = Math.max(t.bottom, r.bottom); } }
-    if (!isFinite(t.left)) Object.assign(t, title.getBoundingClientRect().toJSON());
-    if (innerWidth <= 820) { ok = false; return; }
-    svg.setAttribute('viewBox', `0 0 ${f.width} ${f.height}`);
-    const edge = 28, gap = 28, top = 24, bot = f.height - 24, H = bot - top;
-    const zones = [[edge - f.left, t.left - f.left - gap], [t.right - f.left + gap, innerWidth - f.left - edge]];
-    const zw = Math.max(80, Math.min(zones[0][1] - zones[0][0], zones[1][1] - zones[1][0]));
-    const heroK = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hero-k')) || 1;
-    const base = Math.max(76, Math.min(230, zw * .55, H * .17) * heroK);   // piece width unit, from the room we have
-    const cx0 = (t.left + t.right) / 2 - f.left, cy0 = (t.top + t.bottom) / 2 - f.top;
-    for (const set of Object.values(sets)) for (const o of set.items) {
+  let ok = false, G = null;
+  const place = set => {
+    if (!G) return;
+    const { zones, top, bot, H, base, t, f } = G;
+    const hk = (t.right - t.left) / (HAND_F.r - HAND_F.l);   // the headline's width against the 14 inch one
+    for (const o of set.items) {
+      if (o.hand) {   // a hand-placed piece
+        const [, x, y, w0, rot] = o.hand, left = x < HAND_F.w / 2;
+        const w = Math.max(56, w0 * hk), h = w / o.ar;
+        const ta = Math.abs(rot) * Math.PI / 180, bw = w * Math.cos(ta) + h * Math.sin(ta), bh = w * Math.sin(ta) + h * Math.cos(ta);
+        let vx = left ? x / HAND_F.l * t.left : innerWidth - (HAND_F.w - x) / (HAND_F.w - HAND_F.r) * (innerWidth - t.right);
+        const lo = left ? 8 + bw / 2 : t.right + bw / 2, hi = left ? t.left - bw / 2 : innerWidth - 8 - bw / 2;   // never over the headline or off screen
+        vx = hi < lo ? (lo + hi) / 2 : Math.max(lo, Math.min(hi, vx));
+        const vy = f.top + (y - HAND_F.top) * f.height / HAND_F.h;
+        o.bw = bw; o.bh = bh; o.tilt = rot; o.vv = Math.min(1, Math.max(0, (y - HAND_F.top) / HAND_F.h));
+        o.tx = vx - f.left; o.ty = Math.max(8 + bh / 2, Math.min(f.height - 8 - bh / 2, vy - f.top));
+        o.cx = o.tx; o.cy = o.ty;
+        o.d = Math.min(1, Math.max(.35, .5 + (w0 / 140 - .88) * .9));   // bigger reads closer: more parallax
+        o.k = base / 120; o.draw(w); o.h = h;
+        o.delay = (1 - o.vv) * .12 + (left ? 0 : .02);
+        o.rise = Math.max(70, H * .12); o.lift = o.rise * .5;
+        continue;
+      }
       // same visual weight for every shape: size by area, not width (a wide chat bubble and a tall lock read
-      // the same size), and keep the slot-to-slot variation small so nothing looks tiny or oversized
-      const ss = .82 + (o.s - .6) * .4;
+      // the same size). The hand-made table keeps sizes close; a random small-screen pick (o.ssz) varies more
+      const ss = o.ssz || .82 + (o.s - .6) * .4;
       const [z0, z1] = zones[o.side], w = Math.max(56, ss * base * Math.sqrt(o.ar)), h = w / o.ar;
       // fit the tilted piece, not the upright one, so a turned corner never leaves the zone
       const ta = Math.abs(o.tilt) * Math.PI / 180, bw = w * Math.cos(ta) + h * Math.sin(ta), bh = w * Math.sin(ta) + h * Math.cos(ta);
@@ -102,11 +118,11 @@
       o.rise = Math.max(70, H * .12);
       o.lift = o.rise * .5;
     }
-    // safety net for in-between window sizes: the table already keeps pieces apart, this only pushes a pair
-    // apart vertically if an odd zone shape ever brings two closer than 24px
-    for (const set of Object.values(sets)) for (let pass = 0; pass < 6; pass++) {
+    // safety net: push a pair of shown pieces apart vertically if they ever come closer than 24px
+    const on = set.items.filter(o => !o.off && !o.hand);
+    for (let pass = 0; pass < 6; pass++) {
       let moved = false;
-      for (const a of set.items) for (const b of set.items) {
+      for (const a of on) for (const b of on) {
         if (a === b || a.side !== b.side || a.ty > b.ty) continue;
         const ox = (a.bw + b.bw) / 2 + 24 - Math.abs(a.tx - b.tx), oy = (a.bh + b.bh) / 2 + 24 - (b.ty - a.ty);
         if (ox <= 0 || oy <= 0) continue;
@@ -116,6 +132,23 @@
       }
       if (!moved) break;
     }
+  };
+  const layout = () => {
+    const f = fold.getBoundingClientRect();
+    // the headline's real text box (the h1 itself is wider than its words)
+    const t = { left: Infinity, right: -Infinity, top: Infinity, bottom: -Infinity };
+    const tw = document.createTreeWalker(title, NodeFilter.SHOW_TEXT);
+    for (let n; (n = tw.nextNode());) { const rg = document.createRange(); rg.selectNodeContents(n); for (const r of rg.getClientRects()) if (r.width) { t.left = Math.min(t.left, r.left); t.right = Math.max(t.right, r.right); t.top = Math.min(t.top, r.top); t.bottom = Math.max(t.bottom, r.bottom); } }
+    if (!isFinite(t.left)) Object.assign(t, title.getBoundingClientRect().toJSON());
+    if (innerWidth <= 820) { ok = false; return; }
+    svg.setAttribute('viewBox', `0 0 ${f.width} ${f.height}`);
+    const edge = 28, gap = 28, top = 24, bot = f.height - 24, H = bot - top;
+    const zones = [[edge - f.left, t.left - f.left - gap], [t.right - f.left + gap, innerWidth - f.left - edge]];
+    const zw = Math.max(80, Math.min(zones[0][1] - zones[0][0], zones[1][1] - zones[1][0]));
+    const heroK = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hero-k')) || 1;
+    const base = Math.max(76, Math.min(230, zw * .55, H * .17) * heroK);   // piece width unit, from the room we have
+    G = { zones, top, bot, H, base, t, f };
+    for (const set of Object.values(sets)) place(set);
     ok = true;
   };
 
@@ -139,8 +172,9 @@
       if (set.target) busy = true;
       for (const o of set.items) {
         if (o.a == null) { o.y = o.rise; o.vy = 0; o.a = 0; o.sc = 1; o.vs = 0; }   // y here is the offset from its resting spot
+        if (o.off && (set.mode === 'in' || set.mode === 'pop') && o.a <= .004) { o.a = 0; o.y = o.rise; o.vy = 0; o.sc = 1; o.vs = 0; o.outer.setAttribute('opacity', '0'); continue; }   // not picked this time (small window)
         let ty, ta, K, C, ka, ts = 1, KS = 260, CS = 26;
-        if (set.mode === 'in' || set.mode === 'pop') {
+        if ((set.mode === 'in' || set.mode === 'pop') && !o.off) {   // an unpicked piece still showing sinks away like 'down'
           const wait = set.mode === 'pop' ? o.ripple : o.delay + (set.lag || 0);
           if (o.a < .02 && age < wait) {   // still waiting its turn: parked below (fresh) or shrunk in its slot (swap)
             if (set.mode === 'pop') { o.y = 0; o.vy = 0; o.sc = .55; o.vs = 0; } else { o.y = o.rise; o.vy = 0; o.sc = 1; o.vs = 0; }
@@ -184,6 +218,32 @@
   // ---- hover / focus on the cards ----
   let hideT = 0;
   // card to card: the old set scoops up and away while the new one floats up from below, like a fresh hover.
+  // fewer pieces on smaller screens: 13-16 inch laptops (up to 1800 wide) get 5 or 6, big monitors (27-32 inch)
+  // 7 or 8. Below 8, every hover throws a fresh composition: which pieces, where, how big and how tilted. Each side
+  // splits its height into one band per piece (so they never stack), alternates near-edge / near-headline, and gets
+  // a spread of sizes and tilts, so no two pieces on a side look alike. 8 keeps the hand-made table.
+  const R = (a, b) => a + Math.random() * (b - a);
+  const shuffle = a => a.map(x => [Math.random(), x]).sort((p, q) => p[0] - q[0]).map(x => x[1]);
+  const pick = (set, name) => {
+    const hand = innerWidth <= 2200 && HAND[name];
+    for (const o of set.items) o.hand = hand ? hand.find(h => h[0] === o.art) || null : null;
+    if (hand) { for (const o of set.items) { o.off = !o.hand; o.ssz = 0; } place(set); return; }
+    const n = innerWidth <= 1440 ? 5 : innerWidth <= 1800 ? 6 : innerWidth <= 2200 ? 7 : 8, big = Math.random() < .5 ? 0 : 1;
+    for (const side of [0, 1]) {
+      const its = set.items.filter(o => o.side === side);
+      if (n >= 8) { for (const o of its) { Object.assign(o, o.T); o.off = false; o.ssz = 0; } continue; }
+      const keep = side === big ? Math.ceil(n / 2) : Math.floor(n / 2), order = shuffle(its);
+      const sizes = shuffle([.88, 1, 1.12, 1.26]), par = Math.random() < .5 ? 0 : 1, sgn = Math.random() < .5 ? -1 : 1;
+      order.forEach((o, i) => {
+        o.off = i >= keep; if (o.off) return;
+        o.vv = Math.min(1, Math.max(0, (i + R(.1, .9)) / keep));   // its own band of the height
+        o.u = (i + par) % 2 ? R(.55, 1) : R(0, .4);                 // near the edge, then near the headline, in turn
+        o.ssz = sizes[i]; o.d = .5 + (o.ssz - .88) * .9;             // bigger reads closer: more parallax
+        o.tilt = (i % 2 ? sgn : -sgn) * R(5, 15);
+      });
+    }
+    place(set);
+  };
   const show = (name, card) => {
     clearTimeout(hideT);
     const t = performance.now() / 1000;
@@ -195,7 +255,8 @@
     }
     for (const [n, set] of Object.entries(sets)) {
       const want = n === name ? 1 : 0;
-      if (want && (!set.target || set.mode === 'swap')) { set.mode = 'in'; set.since = t; set.lag = swapping ? SWAP_LAG : 0; set.sy0 = scrollY; }   // the new set always rises from below
+      if (want && (!set.target || set.mode === 'swap')) { if (!set.items.some(o => o.a > .05)) pick(set, n); set.mode = 'in';   // new composition only when none of it is still on screen
+         set.since = t; set.lag = swapping ? SWAP_LAG : 0; set.sy0 = scrollY; }   // the new set always rises from below
       if (!want && (set.target || set.mode === 'in' || set.mode === 'pop')) { set.mode = 'swap'; set.since = t; for (const o of set.items) o.sy = null; }   // exit starts from where each piece is now
       set.target = want;
     }
@@ -210,7 +271,8 @@
   const scrolled = () => { scrolledAt = performance.now(); kick(); };
   addEventListener('wheel', scrolled, { passive: true }); addEventListener('scroll', scrolled, { passive: true });
   // the leave can arrive before the scroll event, so decide a beat later
-  const leave = slot => { const t = performance.now(); setTimeout(() => { if (scrolledAt > t - 400) { parked = true; hold(slot); } else hide(); }, 150); };
+  let leaveT = 0;   // a leave is decided a beat later; entering the next card cancels it, or it would hide the new set
+  const leave = slot => { const t = performance.now(); clearTimeout(leaveT); leaveT = setTimeout(() => { if (cards.querySelector('.hero-card-slot:hover')) return; if (scrolledAt > t - 400) { parked = true; hold(slot); } else hide(); }, 150); };
   let px0 = -1, py0 = -1;   // after a scroll the browser sends a move at the same spot: only a real move counts
   addEventListener('pointermove', e => {
     const moved = Math.abs(e.clientX - px0) + Math.abs(e.clientY - py0) > 2; px0 = e.clientX; py0 = e.clientY;
@@ -220,9 +282,9 @@
     const name = Object.keys(SETS).find(n => a.classList.contains(`hero-card-${n}`));
     if (!name) return;
     const slot = a.closest('.hero-card-slot') || a;
-    slot.addEventListener('pointerenter', () => { parked = false; hold(null); show(name, slot); });
+    slot.addEventListener('pointerenter', () => { clearTimeout(leaveT); parked = false; hold(null); show(name, slot); });
     slot.addEventListener('pointerleave', () => leave(slot));
-    a.addEventListener('focus', () => show(name, slot));
+    a.addEventListener('focus', () => { clearTimeout(leaveT); show(name, slot); });
     a.addEventListener('blur', hide);
   });
 

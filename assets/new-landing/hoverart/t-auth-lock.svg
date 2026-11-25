@@ -1,6 +1,20 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="358.0" height="455.0" fill="none" viewBox="80.0 40.0 358.0 455.0">
-<!-- SVG created with Arrow, by QuiverAI (https://quiver.ai) -->
-  <path d="m150 150.7c2.752-60.22 53.25-105.2 111.7-102l23.1 1.856c56.83 4.096 98.3 53.5 94.85 110.4l-3.136 38.78-59.01-4.416 3.84-43.07c1.984-25.86-18.05-47.94-43.9-48.7l-18.5-1.088c-25.6-1.472-48.45 18.5-49.41 44.8l-2.24 38.66-58.75-5.056 1.408-30.21z" fill="#8A15D5" stroke="#0D0D0D" stroke-width="12" stroke-linejoin="round" stroke-linecap="round" id="shackle_back"/><path d="m379.6 207.9h2.688c26.3 0 48 22.78 47.36 49.09l-13.12 177.3c-1.728 31.23-29.31 54.14-59.14 52.35l-211.5-14.91c-23.74-1.536-43.39-19.9-47.81-42.05 6.592 5.184 14.72 8.768 23.42 9.472l210.9 14.02c21.7 1.792 41.73-16.58 43.2-39.1l16.32-177c0.448-6.784-0.384-13.44-3.968-18.88-2.24-3.84-5.056-7.616-8.32-10.3z" fill="#54047D" stroke="#0D0D0D" stroke-width="12" stroke-linejoin="round" stroke-linecap="round" id="side_extrusion"/>
-  <path d="m104.8 224.7c1.984-21.95 21.18-37.38 42.5-35.97l206.4 17.41c17.09 1.28 29.89 16.19 28.61 33.34l-15.17 173.6c-1.472 19.84-18.94 33.6-37.25 32.32l-207.4-14.14c-21.44-1.472-36.16-20.22-34.37-40.45 4.224-52.1 11.33-114 16.64-166.1z" fill="#8A15D5" stroke="#0D0D0D" stroke-width="12" stroke-linejoin="round" stroke-linecap="round" id="body_front"/>
-  <path d="m285.3 291c0-23.1-18.82-41.6-42.5-41.15-22.46 0.32-41.73 19.33-42.3 41.6-0.384 16.06 8.704 29.76 21.12 35.52l-13.76 43.71c-2.88 10.05 4.672 20.29 14.85 20.93l29.31 1.6c10.88 0.832 19.71-8.64 17.86-18.94l-7.936-45.63c13.82-6.912 23.36-21.12 23.36-37.63z" fill="#FFFFFF" stroke="#0D0D0D" stroke-width="10" stroke-linejoin="round" stroke-linecap="round" id="keyhole"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="305.5" height="382.7" fill="none" viewBox="56.5 55.8 305.5 382.7">
+  <!-- Auth lock, hand drawn in the Locker style: black outline, dark side, white strip inside the top-left edges -->
+  <defs><clipPath id="t-auth-lock-face"><rect x="70" y="180" width="250" height="220" rx="32"/></clipPath></defs>
+  <g transform="rotate(4 195 290)">
+    <!-- shackle: outline, face, white strip on its outer left and top -->
+    <path d="M143.5 215V138A50 50 0 0 1 193.5 88H245.5A50 50 0 0 1 295.5 138V215" stroke="#0D0D0D" stroke-width="61"/>
+    <path d="M143.5 215V138A50 50 0 0 1 193.5 88H245.5A50 50 0 0 1 295.5 138V215" stroke="#8A18DB" stroke-width="49"/>
+    <path d="M122 205V138A71.5 71.5 0 0 1 193.5 66.5H252" stroke="#fff" stroke-width="6" stroke-linecap="round"/>
+    <!-- body: dark side, then the front face -->
+    <rect x="100" y="202" width="250" height="220" rx="32" fill="#4D0B7A" stroke="#0D0D0D" stroke-width="12"/>
+    <rect x="70" y="180" width="250" height="220" rx="32" fill="#8A18DB"/>
+    <g clip-path="url(#t-auth-lock-face)">
+      <rect x="70" y="180" width="250" height="220" rx="32" stroke="#fff" stroke-width="24"/>
+      <rect x="82" y="192" width="250" height="220" rx="32" fill="#8A18DB"/>
+    </g>
+    <rect x="70" y="180" width="250" height="220" rx="32" stroke="#0D0D0D" stroke-width="12"/>
+    <!-- keyhole -->
+    <path d="M187.1 299.9A33 33 0 1 1 214.9 299.9L226 350Q228 362 216 362H186Q174 362 176 350Z" fill="#fff" stroke="#0D0D0D" stroke-width="10" stroke-linejoin="round"/>
+  </g>
 </svg>
