@@ -64,22 +64,22 @@ html[data-intro] .hero-cards .hero-card .hero-card-more::after {
 
 /* hover and keyboard focus: same pop as before, restated from the new rest box */
 @media (hover: hover) and (pointer: fine) {
-  html[data-intro] .hero-cards .hero-card-slot:hover .hero-card .hero-card-icon img {
+  html[data-intro] .hero-cards .hero-card-slot:hover .hero-card .hero-card-icon img, html[data-intro] .hero-cards .hero-card-slot.is-held .hero-card .hero-card-icon img {
     transform: translate(-26.4px, -40px) rotate(11.4deg) scale(1.66);
   }
-  html[data-intro] .hero-cards .hero-card-slot:hover .hero-card-photos .hero-card-icon img {
+  html[data-intro] .hero-cards .hero-card-slot:hover .hero-card-photos .hero-card-icon img, html[data-intro] .hero-cards .hero-card-slot.is-held .hero-card-photos .hero-card-icon img {
     transform: translate(-26.5px, -39px) rotate(11.4deg) scale(1.66);
   }
-  html[data-intro] .hero-cards .hero-card-slot:hover .hero-card .hero-card-text {
+  html[data-intro] .hero-cards .hero-card-slot:hover .hero-card .hero-card-text, html[data-intro] .hero-cards .hero-card-slot.is-held .hero-card .hero-card-text {
     transform: translate(30px, -50%);
   }
-  html[data-intro] .hero-cards .hero-card-slot:hover .hero-card-photos .hero-card-text {
+  html[data-intro] .hero-cards .hero-card-slot:hover .hero-card-photos .hero-card-text, html[data-intro] .hero-cards .hero-card-slot.is-held .hero-card-photos .hero-card-text {
     transform: translate(34px, -50%);
   }
-  html[data-intro] .hero-cards .hero-card-slot:hover .hero-card .hero-card-more {
+  html[data-intro] .hero-cards .hero-card-slot:hover .hero-card .hero-card-more, html[data-intro] .hero-cards .hero-card-slot.is-held .hero-card .hero-card-more {
     color: #fff; opacity: 1; max-height: 2em; overflow: visible; transform: none;
   }
-  html[data-intro] .hero-cards .hero-card-slot:hover .hero-card .hero-card-more::after {
+  html[data-intro] .hero-cards .hero-card-slot:hover .hero-card .hero-card-more::after, html[data-intro] .hero-cards .hero-card-slot.is-held .hero-card .hero-card-more::after {
     transform: translateX(2px) rotate(45deg);
   }
 }
@@ -165,7 +165,7 @@ html[data-intro] .hero-cards .hero-card:focus-visible .hero-card-more::after {
 /* Auth: its "e" sits ~22px further left in the artwork than Locker's, so the shared pop
    pushed it out of the pill's top-left. Same pop, landed a little right and lower. */
 @media (hover: hover) and (pointer: fine) {
-  html[data-intro] .hero-cards .hero-card-slot:hover .hero-card-auth .hero-card-icon img {
+  html[data-intro] .hero-cards .hero-card-slot:hover .hero-card-auth .hero-card-icon img, html[data-intro] .hero-cards .hero-card-slot.is-held .hero-card-auth .hero-card-icon img {
     transform: translate(-20px, -35px) rotate(11.4deg) scale(1.66);
   }
 }
@@ -202,10 +202,24 @@ html[data-intro] body .duck-band .hero-duckies { transform: translate3d(-120vw, 
 
 /* hover text (name + Learn more) centred between the visible tile edge and the white rim, per card (measured by pixels) */
 @media (hover: hover) and (pointer: fine) {
-  html[data-intro] .hero-cards .hero-card-slot:hover .hero-card-photos .hero-card-text { transform: translate(21px, -50%); }
-  html[data-intro] .hero-cards .hero-card-slot:hover .hero-card-locker .hero-card-text { transform: translate(22px, -50%); }
-  html[data-intro] .hero-cards .hero-card-slot:hover .hero-card-auth .hero-card-text { transform: translate(24.6px, -50%); }
+  html[data-intro] .hero-cards .hero-card-slot:hover .hero-card-photos .hero-card-text, html[data-intro] .hero-cards .hero-card-slot.is-held .hero-card-photos .hero-card-text { transform: translate(21px, -50%); }
+  html[data-intro] .hero-cards .hero-card-slot:hover .hero-card-locker .hero-card-text, html[data-intro] .hero-cards .hero-card-slot.is-held .hero-card-locker .hero-card-text { transform: translate(22px, -50%); }
+  html[data-intro] .hero-cards .hero-card-slot:hover .hero-card-auth .hero-card-text, html[data-intro] .hero-cards .hero-card-slot.is-held .hero-card-auth .hero-card-text { transform: translate(24.6px, -50%); }
 }
 html[data-intro] .hero-cards .hero-card-photos:focus-visible .hero-card-text { transform: translate(21px, -50%); }
 html[data-intro] .hero-cards .hero-card-locker:focus-visible .hero-card-text { transform: translate(22px, -50%); }
 html[data-intro] .hero-cards .hero-card-auth:focus-visible .hero-card-text { transform: translate(24.6px, -50%); }
+
+/* held: after a scroll slides the card out from under a still cursor, it keeps the full hover look
+   (the base stylesheet's hover rules, restated for .is-held) while its pieces stay up */
+@media (hover: hover) and (pointer: fine) {
+  html[data-intro] .hero-cards .hero-card-slot.is-held .hero-card { background-color: #fff; transform: rotate(-2.2deg) scale(1.03); }
+  html[data-intro] .hero-cards .hero-card-slot.is-held .hero-card::before { opacity: 1; }
+  html[data-intro] .hero-cards .hero-card-slot.is-held .hero-card::after { box-shadow: none; }
+  html[data-intro] .hero-cards .hero-card-slot.is-held .hero-card-icon { clip-path: inset(8px round 26px); }
+  html[data-intro] .hero-cards .hero-card-slot.is-held .hero-card-name { color: #fff; }
+  html[data-intro] .hero-fold:has(.hero-card-slot.is-held .hero-card-photos) .hero-tint-photos,
+  html[data-intro] .hero-fold:has(.hero-card-slot.is-held .hero-card-auth) .hero-tint-auth,
+  html[data-intro] .hero-fold:has(.hero-card-slot.is-held .hero-card-locker) .hero-tint-locker { opacity: 1; transform: none; }
+  html[data-intro] .hero-fold:has(.hero-card-slot.is-held) .hero-chevron img { filter: none; }
+}

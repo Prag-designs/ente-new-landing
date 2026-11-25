@@ -112,7 +112,7 @@ html[data-intro] .logo-strip { margin-top: 48px; }
 /* card hover: no full-page colour wash; the hovered card casts a soft glow in its own colour instead */
 html[data-intro] .hero-tint { display: none; }
 @media (hover: hover) and (pointer: fine) {
-  html[data-intro] .hero-card-slot:hover .hero-card {
+  html[data-intro] .hero-card-slot:hover .hero-card, html[data-intro] .hero-card-slot.is-held .hero-card {
     box-shadow: 0 16px 48px -16px color-mix(in srgb, var(--brand) 60%, transparent), inset 0 0 0 1px transparent;
   }
 }

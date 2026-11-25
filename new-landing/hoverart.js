@@ -11,7 +11,7 @@
   const ART = '/assets/new-landing/hoverart/';
   // coloured illustrations (GPT-drawn, thick black outline, thin white rim, flat body, darker side, no highlights).
   // width / height of each trimmed image
-  const AR = {camera: 1.3559, polaroid: 1.0774, filmroll: 1.3061, frame: 1.1189, cloud: 1.7978, heart: 0.6891, album: 0.7766, mappin: 0.7000, shield: 0.9031, lock: 0.7344, fingerprint: 0.9609, codephone: 0.6906, keys: 0.9859, otp: 1.4612, stopwatch: 0.7781, qrcode: 0.9859, vault: 1.2355, passport: 0.8386, docfolder: 1.3599, password: 2.2222, diploma: 1.8955, idcard: 1.4055, housedeed: 0.8406, medical: 0.8145};
+  const AR = {camera: 1.3161, polaroid: 0.8256, filmroll: 1.3211, frame: 1.2512, cloud: 1.3404, heart: 1.0325, album: 0.7766, mappin: 0.7298, shield: 0.8860, lock: 0.7868, fingerprint: 0.9617, codephone: 0.6913, keys: 0.8009, otp: 1.5595, stopwatch: 0.7883, qrcode: 1.0064, vault: 1.2339, passport: 0.8386, docfolder: 1.3599, password: 2.2115, diploma: 1.8955, idcard: 1.4055, housedeed: 0.8406, medical: 0.8145};
 
   // ---- composition: four pieces per side, placed by hand like stickers thrown around a title. Every product and
   // side has its own arrangement (a pair up top, a pair at the bottom, a loose arc, a sweep), so there are no
@@ -21,7 +21,7 @@
   //   beside the headline and the cards a piece stays in the outer half, so the text has air;
   //   sizes stay within a narrow band, so every piece carries about the same weight.
   // pieces redrawn as clean vectors (Quiver), the rest are still the GPT pictures
-  const VEC = new Set(['locker-passport', 'locker-idcard', 'locker-docfolder', 'locker-housedeed', 'locker-medical', 'locker-diploma']);
+  const VEC = { has: () => true };   // every piece is now a clean Quiver vector
   const PER = 4;
   const PLACE = {
     photos: [
@@ -57,7 +57,7 @@
     [[scatter(name, 0), 0], [scatter(name, 1), 1]].forEach(([slots, side]) => slots.forEach(([u, v, s, tilt, d], i) => {
       const art = list[side * PER + i], ar = AR[art], x = u * 300, y = v * 420;
       const outer = document.createElementNS(NS, 'g'), inner = document.createElementNS(NS, 'g'), img = document.createElementNS(NS, 'image');
-      img.setAttribute('href', ART + 't-' + name + '-' + art + (VEC.has(name + '-' + art) ? '.svg?v=1' : '.webp?v=4'));   // each set drawn in its product's colour; bump to refetch
+      img.setAttribute('href', ART + 't-' + name + '-' + art + (VEC.has(name + '-' + art) ? '.svg?v=2' : '.webp?v=4'));   // each set drawn in its product's colour; bump to refetch
       inner.appendChild(img); outer.appendChild(inner); outer.setAttribute('opacity', '0');
       g.appendChild(outer);
       const draw = w => { draw.w = w; const h = w / ar; img.setAttribute('width', w.toFixed(1)); img.setAttribute('height', h.toFixed(1)); img.setAttribute('x', (-w / 2).toFixed(1)); img.setAttribute('y', (-h / 2).toFixed(1)); };
@@ -120,7 +120,9 @@
   };
 
   // ---- motion: a spring per piece, running only while something is shown or moving ----
-  const EXIT = .16, EXIT_LIFT = 34, SWAP_LAG = .07;   // old set gone in .16 s; the new one starts rising once it is mostly clear
+  const EXIT = .16, EXIT_LIFT = 34, SWAP_LAG = .07;
+  const OUT = .2, OUT_DROP = 14, OUT_STAGGER = .05;   // leaving the cards
+  const PAR = .7;   // on scroll a piece moves up 1.35-1.55x the page speed, by its depth   // old set gone in .16 s; the new one starts rising once it is mostly clear
   let mx = 0, my = 0, tmx = 0, tmy = 0, raf = 0, last = 0, now = 0;
   addEventListener('pointermove', e => { tmx = e.clientX / innerWidth - .5; tmy = e.clientY / innerHeight - .5; kick(); }, { passive: true });
   const frame = ts => {
@@ -148,10 +150,12 @@
           if (set.mode === 'pop') { KS = 320; CS = 17; }   // a quick pop with one small overshoot
         } else {
           if (o.a <= .004) { o.a = 0; o.y = o.rise; o.vy = 0; o.sc = 1; o.vs = 0; o.outer.setAttribute('opacity', '0'); continue; }   // gone: park below for next time
-          if (set.mode === 'swap') {   // another card took over: the old set lifts a little and shrinks away, gone in EXIT s (never a slow see-through drift)
+          if (set.mode === 'swap' || set.mode === 'out') {   // swap: another card took over, the old set lifts a little and shrinks away in EXIT s.
+            // out: off the cards, each piece shrinks back into its own spot and drops a touch, top ones first (the entrance in reverse), all gone in under .25 s
             if (o.sy == null) { o.sy = o.y; o.sa = o.a; o.ss = o.sc; }
-            const e = Math.min(1, age / EXIT), k = 1 - (1 - e) * (1 - e);   // ease-out: moves the instant you hop
-            o.y = o.sy - EXIT_LIFT * o.k * k; o.vy = 0; o.sc = o.ss * (1 - .4 * k); o.vs = 0; o.a = e >= 1 ? 0 : o.sa * (1 - k);
+            const out = set.mode === 'out', wait = out ? o.vv * OUT_STAGGER : 0, dur = out ? OUT : EXIT;
+            const e = Math.max(0, Math.min(1, (age - wait) / dur)), k = 1 - (1 - e) * (1 - e) * (1 - e);   // strong ease-out: moves the instant you leave
+            o.y = o.sy + (out ? OUT_DROP : -EXIT_LIFT) * o.k * k; o.vy = 0; o.sc = o.ss * (1 - (out ? .3 : .4) * k); o.vs = 0; o.a = e >= 1 ? 0 : o.sa * (1 - k);
             if (e < 1) busy = true;
             K = 0; ka = 0; ta = o.a; ty = o.y; ts = o.sc;
           }
@@ -166,7 +170,7 @@
         const A = reduce ? 0 : 1;
         const fy = Math.sin(now * o.w + o.ph) * (2 + o.d * 4) * o.k * A;
         const fr = o.tilt + Math.sin(now * o.w * .8 + o.ph * 1.3) * o.rot * A;
-        const px = -mx * 30 * o.d * A, py = -my * 18 * o.d * A;
+        const px = -mx * 30 * o.d * A, py = -my * 18 * o.d * A - (scrollY - (set.sy0 ?? scrollY)) * PAR * o.d * A;   // scroll parallax: each piece outruns the page by its depth
         o.outer.setAttribute('opacity', Math.max(0, Math.min(1, o.a)).toFixed(3));
         o.outer.setAttribute('transform', `translate(${(o.tx + px).toFixed(1)} ${(o.ty + o.y + py + fy).toFixed(1)})`);
         o.inner.setAttribute('transform', `rotate(${fr.toFixed(2)}) scale(${Math.max(0, o.sc).toFixed(3)})`);
@@ -191,19 +195,33 @@
     }
     for (const [n, set] of Object.entries(sets)) {
       const want = n === name ? 1 : 0;
-      if (want && (!set.target || set.mode === 'swap')) { set.mode = 'in'; set.since = t; set.lag = swapping ? SWAP_LAG : 0; }   // the new set always rises from below
+      if (want && (!set.target || set.mode === 'swap')) { set.mode = 'in'; set.since = t; set.lag = swapping ? SWAP_LAG : 0; set.sy0 = scrollY; }   // the new set always rises from below
       if (!want && (set.target || set.mode === 'in' || set.mode === 'pop')) { set.mode = 'swap'; set.since = t; for (const o of set.items) o.sy = null; }   // exit starts from where each piece is now
       set.target = want;
     }
     kick();
   };
-  const hide = () => { clearTimeout(hideT); hideT = setTimeout(() => { for (const set of Object.values(sets)) { if (set.target) { set.mode = 'down'; set.since = performance.now() / 1000; } set.target = 0; } kick(); }, 160); };   // off the cards: sink and fade (the wait lets you cross the gap to the next card)
+  const hide = () => { hold(null); clearTimeout(hideT); hideT = setTimeout(() => { for (const set of Object.values(sets)) { if (set.target || set.mode === 'in' || set.mode === 'pop') { set.mode = 'out'; set.since = performance.now() / 1000; for (const o of set.items) o.sy = null; } set.target = 0; } kick(); }, 160); };   // off the cards: shrink away in place (the wait lets you cross the gap to the next card)
+  // scrolling slides the card out from under a still cursor and the browser reports that as a leave. That is not
+  // the visitor leaving: the pieces stay put and ride up with the hero. They go once the mouse really moves off.
+  let scrolledAt = 0, parked = false, heldSlot = null;
+  // the card under the parked pieces keeps its hover look, so the page never shows pieces with no card lit
+  const hold = s => { if (heldSlot && heldSlot !== s) heldSlot.classList.remove('is-held'); heldSlot = s; if (s) s.classList.add('is-held'); };
+  const scrolled = () => { scrolledAt = performance.now(); kick(); };
+  addEventListener('wheel', scrolled, { passive: true }); addEventListener('scroll', scrolled, { passive: true });
+  // the leave can arrive before the scroll event, so decide a beat later
+  const leave = slot => { const t = performance.now(); setTimeout(() => { if (scrolledAt > t - 400) { parked = true; hold(slot); } else hide(); }, 150); };
+  let px0 = -1, py0 = -1;   // after a scroll the browser sends a move at the same spot: only a real move counts
+  addEventListener('pointermove', e => {
+    const moved = Math.abs(e.clientX - px0) + Math.abs(e.clientY - py0) > 2; px0 = e.clientX; py0 = e.clientY;
+    if (parked && moved && !(e.target.closest && e.target.closest('.hero-card-slot'))) { parked = false; hide(); }
+  }, { passive: true });
   cards.querySelectorAll('.hero-card').forEach(a => {
     const name = Object.keys(SETS).find(n => a.classList.contains(`hero-card-${n}`));
     if (!name) return;
     const slot = a.closest('.hero-card-slot') || a;
-    slot.addEventListener('pointerenter', () => show(name, slot));
-    slot.addEventListener('pointerleave', hide);
+    slot.addEventListener('pointerenter', () => { parked = false; hold(null); show(name, slot); });
+    slot.addEventListener('pointerleave', () => leave(slot));
     a.addEventListener('focus', () => show(name, slot));
     a.addEventListener('blur', hide);
   });

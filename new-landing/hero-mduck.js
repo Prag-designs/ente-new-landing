@@ -68,7 +68,7 @@
   Promise.race([document.fonts ? document.fonts.ready : Promise.resolve(), new Promise(r => setTimeout(r, 1200))]).then(() => { size(); placed(); });
   let ready = false;
   const r = new rive.Rive({
-    src: '/assets/new-landing/ente-hero-duckies.riv?v=12',
+    src: '/assets/new-landing/ente-hero-duckies.riv?v=13',
     canvas, artboard: 'Hero', stateMachines: 'State Machine', autoplay: true, autoBind: true,
     layout: new rive.Layout({ fit: rive.Fit.Contain, alignment: rive.Alignment.BottomCenter }),
     onLoad: () => {
